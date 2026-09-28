@@ -6,26 +6,27 @@
 <title>CampusOS — Attendance · Room Finder · 3D Map</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#0b1120;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
-.shell{position:sticky;top:0;z-index:50;background:rgba(11,17,32,.92);backdrop-filter:blur(10px);border-bottom:1px solid #1e293b}
-.shell-in{max-width:1120px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.shell-brand{display:flex;align-items:center;gap:10px;margin-right:auto}
-.shell-logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#22d3ee);display:flex;align-items:center;justify-content:center;font-size:20px}
-.shell-brand h1{margin:0;font-size:18px;letter-spacing:.3px}
-.shell-brand p{margin:0;font-size:11.5px;color:#94a3b8}
-.tabs{display:flex;gap:6px;flex-wrap:wrap}
-.tabbtn{background:#0f172a;border:1px solid #1e293b;color:#cbd5e1;padding:9px 14px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap}
-.tabbtn:hover{border-color:#6366f1}
-.tabbtn.on{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-color:transparent}
-.shell-clock{text-align:right;line-height:1.25}
-.shell-clock .t{font-weight:800;font-size:16px;font-variant-numeric:tabular-nums}
-.shell-clock .d{font-size:11.5px;color:#94a3b8}
-main{max-width:1120px;margin:0 auto;padding:20px 18px 60px}
-.tabpage{animation:fadeUp .35s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-@media(max-width:720px){
+body{margin:0;background:#f3f5f9;color:#1a2334;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.shell{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid #e2e8f2}
+.shell-in{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.shell-brand{display:flex;align-items:center;gap:12px;margin-right:auto}
+.shell-logo{width:38px;height:38px;border-radius:11px;background:#e8efff;display:flex;align-items:center;justify-content:center;flex:none}
+.shell-brand h1{margin:0;font-size:19px;font-weight:750;letter-spacing:-.2px;color:#0f1b2d}
+.shell-brand p{margin:2px 0 0;font-size:12px;color:#6b7a93}
+.tabs{display:flex;gap:2px;background:#e9edf3;border-radius:12px;padding:4px}
+.tabbtn{border:0;background:transparent;color:#5d6b84;padding:8px 16px;border-radius:9px;font-size:13.5px;font-weight:650;cursor:pointer;white-space:nowrap;font-family:inherit}
+.tabbtn:hover{color:#1a2334}
+.tabbtn.on{background:#fff;color:#0f1b2d;box-shadow:0 1px 3px rgba(16,24,40,.14)}
+.shell-clock{text-align:right;line-height:1.3}
+.shell-clock .t{font-weight:750;font-size:16px;font-variant-numeric:tabular-nums;color:#0f1b2d}
+.shell-clock .d{font-size:11.5px;color:#6b7a93}
+main{max-width:1180px;margin:0 auto;padding:24px 20px 64px}
+.tabpage{animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(max-width:760px){
   .shell-clock{display:none}
   .tabs{width:100%;overflow-x:auto}
+  .shell-in{gap:12px}
 }
 
 
@@ -262,19 +263,65 @@ main{max-width:1120px;margin:0 auto;padding:20px 18px 60px}
   .m3-hint{display:none}
 }
 
+/* ============ CampusOS light product theme (loaded last: wins the cascade) ============ */
+
+/* ---------- RoomRadar: dark navy -> clean light ---------- */
+.rr-app{
+  --bg:#f3f5f9; --bg2:#eef1f6; --card:#ffffff; --card2:#f6f8fb;
+  --line:#e2e8f2; --txt:#1a2334; --mut:#5d6b84;
+  --acc:#2f5bff; --acc2:#2f5bff;
+  --free:#067647; --busy:#d92d20; --warn:#b54708;
+}
+.rr-app{background:#f3f5f9}
+.rr-app .logo{background:#2f5bff;color:#fff;box-shadow:none}
+.rr-app .hero{background:#fff;box-shadow:0 1px 3px rgba(16,24,40,.08)}
+.rr-app .airow input,.rr-app .ctl select,.rr-app .ctl input[type=time],.rr-app .ctl input[type=number]{background:#f6f8fb}
+.rr-app .airow input:focus{box-shadow:0 0 0 3px rgba(47,91,255,.15)}
+.rr-app .chip,.rr-app .fbtn{background:#f6f8fb}
+.rr-app .fbtn.on{background:#e8efff;border-color:#2f5bff;color:#1a2334}
+.rr-app .itag{background:#eef3ff;border-color:#c9d6ff;color:#2f5bff}
+.rr-app .res{background:#fff}
+.rr-app .floorsec>h3 .cnt{background:#f6f8fb}
+.rr-app .closebtn{background:#f6f8fb}
+.rr-app .empty{background:#f6f8fb}
+.rr-app .drawer{background:rgba(15,27,45,.5)}
+
+/* ---------- AttendGuard: flatten gradients to solid brand color ---------- */
+#ag-app .topbar{background:#2f5bff}
+#ag-app #chatPanel .chead{background:#2f5bff}
+
+/* ---------- 3D map chrome -> light (the 3D stage itself stays dark) ---------- */
+.m3-head h2{color:#0f1b2d}
+.m3-sub{color:#6b7a93}
+.m3-floors button{background:#fff;border:1px solid #dbe2ee;color:#46566f}
+.m3-floors button.on{background:#2f5bff;border-color:#2f5bff;color:#fff}
+.m3-toggles button{background:#fff;border:1px solid #dbe2ee;color:#46566f}
+.m3-toggles button.on{border-color:#2f5bff;color:#2f5bff}
+.m3-panel{background:#fff;border:1px solid #e2e8f2;box-shadow:0 1px 3px rgba(16,24,40,.08)}
+.m3-tlabel{color:#6b7a93}
+.m3-rno{color:#0f1b2d}
+.m3-timer{color:#0f1b2d}
+.m3-claim{background:#f6f8fb;border:1px solid #e2e8f2;color:#1a2334}
+.m3-note{color:#98a2b8}
+.m3-preview{background:#fffaeb;border:1px solid #fedf89;color:#93370d}
+.m3-preview b{color:#93370d}
+.m3-x{background:#eef1f6;color:#5d6b84}
+.m3-squad{background:#067647}
+.m3-squad:hover{background:#05603a}
+
 </style>
 </head>
 <body>
 <header class="shell"><div class="shell-in">
   <div class="shell-brand">
-    <div class="shell-logo">🏫</div>
-    <div><h1>CampusOS</h1><p>SRM IST · Attendance + Smart Room Finder · by <b>The Quantum Quad ⚛</b></p></div>
+    <span class="shell-logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2f5bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 7.5h2M13 7.5h2M9 11h2M13 11h2M9 14.5h2M13 14.5h2M10.5 21v-2.8h3V21"/></svg></span>
+    <div><h1>CampusOS</h1><p>SRM Institute of Science and Technology &middot; by The Quantum Quad</p></div>
   </div>
   <nav class="tabs">
-    <button class="tabbtn on" data-tab="tab-attend">📊 Attendance</button>
-    <button class="tabbtn" data-tab="tab-grid">🗺️ Floor Grid</button>
-    <button class="tabbtn" data-tab="tab-ai">✨ AI Finder</button>
-    <button class="tabbtn" data-tab="tab-map">🏢 3D Map</button>
+    <button class="tabbtn on" data-tab="tab-attend">Attendance</button>
+    <button class="tabbtn" data-tab="tab-grid">Floor Grid</button>
+    <button class="tabbtn" data-tab="tab-ai">AI Finder</button>
+    <button class="tabbtn" data-tab="tab-map">3D Map</button>
   </nav>
   <div class="shell-clock"><div class="t" id="clockT">--:--</div><div class="d" id="clockD">—</div></div>
 </div></header>
