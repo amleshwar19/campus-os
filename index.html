@@ -1786,26 +1786,69 @@ function initGL(){
   FLOORS3D.forEach((fl,fi)=>{
     const grp=new THREE.Group(); grp.position.y=fi*PITCH*spread; scene.add(grp);
     const n=fl.rooms.length, tot=n*RW+(n-1)*GAP, x0=-tot/2+RW/2;
-    const slabMat=new THREE.MeshPhongMaterial({color:0x8b9cf9,transparent:true,opacity:0.22,
-      shininess:90,specular:0x666677});
-    const slab=new THREE.Mesh(new THREE.BoxGeometry(tot+2.2,0.16,5.2),slabMat);
-    slab.position.y=-0.08; slab.receiveShadow=true; grp.add(slab);
-    const edgeMat=new THREE.LineBasicMaterial({color:0xa5b4fc,transparent:true,opacity:0.85});
+    const slabW=tot+2.2, slabD=5.2;
+    const slabMat=new THREE.MeshPhongMaterial({color:0x3d4a63,transparent:true,opacity:1,
+      shininess:40,specular:0x333344});
+    const slab=new THREE.Mesh(new THREE.BoxGeometry(slabW,0.16,slabD),slabMat);
+    slab.position.y=-0.08; slab.receiveShadow=true; slab.castShadow=true; grp.add(slab);
+    const edgeMat=new THREE.LineBasicMaterial({color:0xa5b4fc,transparent:true,opacity:0.4});
     grp.add(new THREE.LineSegments(new THREE.EdgesGeometry(slab.geometry),edgeMat));
-    const rec={f:fl.f,fi,group:grp,slabMat,edgeMat,rooms:[]};
+    /* ---- building shell: columns, solid walls, glass front (cutaway view) ---- */
+    const structMats=[];
+    const sMat=(dc,lc,op)=>{const m=new THREE.MeshLambertMaterial({color:dc,transparent:true,opacity:op==null?1:op});
+      m.userData.dc=dc; m.userData.lc=lc; m.userData.op=op==null?1:op; structMats.push(m); return m;};
+    const colMat=sMat(0x707b94,0xdde3ef), wallMat=sMat(0x525d75,0xc9d2e4);
+    const colGeo=new THREE.BoxGeometry(0.24,PITCH,0.24);
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx,sz])=>{
+      const c=new THREE.Mesh(colGeo,colMat);
+      c.position.set(sx*(slabW/2-0.4),PITCH/2,sz*(slabD/2-0.4));
+      c.castShadow=true; grp.add(c);
+    });
+    const wallT=0.14, wallH=PITCH-0.1;
+    const back=new THREE.Mesh(new THREE.BoxGeometry(slabW,wallH,wallT),wallMat);
+    back.position.set(0,wallH/2,-(slabD/2-wallT/2)); back.castShadow=true; grp.add(back);
+    [-1,1].forEach(sx=>{
+      const w=new THREE.Mesh(new THREE.BoxGeometry(wallT,wallH,slabD-0.3),wallMat);
+      w.position.set(sx*(slabW/2-wallT/2),wallH/2,-0.15); w.castShadow=true; grp.add(w);
+    });
+    const glassMat=new THREE.MeshPhongMaterial({color:0x9fc2ff,transparent:true,opacity:0.14,
+      shininess:120,specular:0x99aacc,side:THREE.DoubleSide,depthWrite:false});
+    glassMat.userData.dc=0x9fc2ff; glassMat.userData.lc=0x9fc2ff; glassMat.userData.op=0.14;
+    structMats.push(glassMat);
+    const glass=new THREE.Mesh(new THREE.PlaneGeometry(slabW-0.5,PITCH-0.25),glassMat);
+    glass.position.set(0,(PITCH-0.25)/2+0.05,slabD/2-0.12); grp.add(glass);
+    const winMat=new THREE.MeshBasicMaterial({color:0xffdf9e,transparent:true,opacity:0.95});
+    winMat.userData.dc=0xffdf9e; winMat.userData.lc=0xffdf9e; winMat.userData.op=0.95;
+    structMats.push(winMat);
+    const win=new THREE.Mesh(new THREE.BoxGeometry(slabW*0.62,0.4,0.05),winMat);
+    win.position.set(0,PITCH*0.6,-(slabD/2-wallT)+0.05); grp.add(win);
+    if(fi===FLOORS3D.length-1){
+      const roof=new THREE.Mesh(new THREE.BoxGeometry(slabW+0.35,0.2,slabD+0.35),colMat);
+      roof.position.y=PITCH+0.1; roof.castShadow=true; grp.add(roof);
+      const ph=0.34, pt=0.12, py=PITCH+0.2+ph/2, rw=slabW+0.35, rd=slabD+0.35;
+      [[rw,pt,0,rd/2-pt/2],[rw,pt,0,-(rd/2-pt/2)],[pt,rd,rw/2-pt/2,0],[pt,rd,-(rw/2-pt/2),0]]
+        .forEach(([w,d,x,z])=>{
+          const p=new THREE.Mesh(new THREE.BoxGeometry(w,ph,d),wallMat);
+          p.position.set(x,py,z); p.castShadow=true; grp.add(p);
+        });
+    }
+    const rec={f:fl.f,fi,group:grp,slabMat,edgeMat,structMats,rooms:[]};
     fl.rooms.forEach((no,j)=>{
       const x=x0+j*(RW+GAP);
       const mat=new THREE.MeshLambertMaterial({color:0x22c55e,emissive:0x22c55e,emissiveIntensity:0.16});
       const mesh=new THREE.Mesh(boxGeo,mat);
       mesh.position.set(x,RH/2,0); mesh.castShadow=true; mesh.userData.no=no;
       mesh.add(new THREE.LineSegments(edgeGeo,edgeMatShared));
+      const capMat=new THREE.MeshLambertMaterial({color:0xeef2f7,transparent:true});
+      const cap=new THREE.Mesh(new THREE.BoxGeometry(RW+0.08,0.1,RD+0.08),capMat);
+      cap.position.y=RH/2+0.05; mesh.add(cap);
       grp.add(mesh); roomMeshes.push(mesh);
       const label=makeLabel(no);
       label.sprite.position.set(x,RH+0.62,0); grp.add(label.sprite);
       const ring=new THREE.Mesh(new THREE.RingGeometry(1.5,1.78,40),
         new THREE.MeshBasicMaterial({color:0x22d3ee,transparent:true,opacity:0.85,side:THREE.DoubleSide}));
       ring.rotation.x=-Math.PI/2; ring.position.set(x,0.03,0); ring.visible=false; grp.add(ring);
-      const r={no,f:fl.f,fi,mesh,mat,label:label.redraw,ring,x,lift:0,labelKey:''};
+      const r={no,f:fl.f,fi,mesh,mat,capMat,label:label.redraw,ring,x,lift:0,labelKey:''};
       roomRecs[no]=r; rec.rooms.push(r);
     });
     floorGroups.push(rec);
@@ -1990,11 +2033,13 @@ function frame(ms){
 function applyFocus(){
   floorGroups.forEach(fl=>{
     const dimmed=focusF!==null&&focusF!==fl.f;
-    fl.slabMat.opacity=dimmed?0.06:0.22;
-    fl.edgeMat.opacity=dimmed?0.15:0.85;
+    fl.slabMat.opacity=dimmed?0.10:1;
+    fl.edgeMat.opacity=dimmed?0.10:0.4;
+    fl.structMats.forEach(m=>{m.opacity=dimmed?0.08:m.userData.op;});
     fl.rooms.forEach(r=>{
       r.mesh.userData.pick=!dimmed;
       r.mat.transparent=dimmed; r.mat.opacity=dimmed?0.12:1;
+      r.capMat.transparent=dimmed; r.capMat.opacity=dimmed?0.12:1;
     });
   });
 }
@@ -2032,7 +2077,10 @@ $('m3theme').addEventListener('click',()=>{
   groundMat.color.set(dark?0x0d1626:0xdbe4f7);
   gridHelper.material.opacity=dark?0.5:0.75;
   scene.fog.color.set(dark?0x0b1120:0xdbe4f7);
-  floorGroups.forEach(fl=>fl.slabMat.color.set(dark?0x8b9cf9:0x6366f1));
+  floorGroups.forEach(fl=>{
+    fl.slabMat.color.set(dark?0x3d4a63:0xc3cbdd);
+    fl.structMats.forEach(m=>{m.color.set(dark?m.userData.dc:m.userData.lc);});
+  });
   markInteracted();
 });
 
